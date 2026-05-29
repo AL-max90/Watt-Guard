@@ -4,7 +4,6 @@ from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
 
 def load_data():
-    # Create hardcoded dataset directly in code - no file needed!
     data = {
         'CONS_NO': ['ACC001', 'ACC002', 'ACC003', 'ACC004', 'ACC005'],
         'FLAG': [0, 1, 0, 0, 1],
@@ -16,7 +15,7 @@ def load_data():
         '6/1/2024': [120, 490, 270, 88, 790],
     }
     df = pd.DataFrame(data)
-    print(f"✅ Loaded {len(df)} accounts from hardcoded data")
+    print(f"Loaded {len(df)} accounts")
     return df
 
 def get_date_columns(df):
@@ -45,7 +44,7 @@ def detect_anomalies(features):
     preds = model.fit_predict(scaled)
     features = features.copy()
     features["anomaly"] = preds
-    features["is_suspicious"] = features["anomaly"].apply(lambda x: True if x == -1 else False)
+    features["is_suspicious"] = features["anomaly"] == -1
     features["risk_level"] = features["anomaly"].apply(lambda x: "High" if x == -1 else "Normal")
     return features
 
