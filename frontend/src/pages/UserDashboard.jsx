@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { Zap, Lightbulb, Calculator, Loader, Send, MessageSquare } from "lucide-react";
 
-const API = process.env.REACT_APP_API_URL || "http://127.0.0.1:5000";
+const API = "https://watt-guard.up.railway.app";
 const APPLIANCES = ["AC", "Geyser", "Refrigerator", "Washing Machine", "LED Lights", "Fans", "TV", "Iron", "Microwave", "Water Pump"];
 
 export default function UserDashboard() {
