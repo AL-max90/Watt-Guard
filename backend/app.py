@@ -1,24 +1,46 @@
+from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from model import (load_data, compute_features, detect_anomalies,
                    get_summary, get_flagged, get_monthly_trend)
-from google import genai
-from dotenv import load_dotenv
-from groq_helper import ask_groq
 import os
+import requests
 
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
-try:
-    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-    AI_AVAILABLE = True
-    print("✅ Gemini AI enabled")
-except Exception as e:
-    AI_AVAILABLE = False
-    print(f"⚠️  AI disabled: {e}")
+# Try to initialize Groq
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+def ask_ai(prompt):
+    """Use Groq for AI responses"""
+    if not GROQ_API_KEY:
+        return "AI not available. Please add GROQ_API_KEY to environment variables."
+    
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+    data = {
+        "model": "mixtral-8x7b-32768",
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.7,
+        "max_tokens": 500
+    }
+    
+    try:
+        response = requests.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers=headers,
+            json=data,
+            timeout=30
+        )
+        response.raise_for_status()
+        return response.json()["choices"][0]["message"]["content"]
+    except Exception as e:
+        return f"AI Error: {str(e)}"
 
 print("📂 Loading dataset...")
 df_raw = load_data()
@@ -26,14 +48,7 @@ features = compute_features(df_raw)
 features = detect_anomalies(features)
 print(f"✅ Loaded {len(df_raw)} accounts")
 
-
-def ask_gemini(prompt):
-    return ask_groq(prompt)
-
-
-# ─────────────────────────────────────────────
-# USER ROUTES
-# ─────────────────────────────────────────────
+# ===================== USER ROUTES =====================
 
 @app.route("/api/user/tips", methods=["POST"])
 def get_tips():
@@ -54,8 +69,7 @@ Provide:
 
 Be friendly, concise, use bullet points. Keep it under 200 words.
 """
-    return jsonify({"tips": ask_gemini(prompt)})
-
+    return jsonify({"tips": ask_ai(prompt)})
 
 @app.route("/api/user/bill-estimate", methods=["POST"])
 def bill_estimate():
@@ -84,7 +98,6 @@ def bill_estimate():
         "rate_used": "NEPRA 2024 slab rates"
     })
 
-
 @app.route("/api/user/chat", methods=["POST"])
 def user_chat():
     data = request.json
@@ -97,22 +110,17 @@ Their monthly usage is approximately {units} units.
 Answer this question helpfully and concisely: {question}
 Focus on practical advice relevant to Pakistan (load shedding, solar, WAPDA rates).
 """
-    return jsonify({"response": ask_gemini(prompt)})
+    return jsonify({"response": ask_ai(prompt)})
 
-
-# ─────────────────────────────────────────────
-# ADMIN ROUTES
-# ─────────────────────────────────────────────
+# ===================== ADMIN ROUTES =====================
 
 @app.route("/api/admin/summary", methods=["GET"])
 def admin_summary():
     return jsonify(get_summary(features))
 
-
 @app.route("/api/admin/flagged", methods=["GET"])
 def admin_flagged():
     return jsonify({"flagged_accounts": get_flagged(features)})
-
 
 @app.route("/api/admin/all-accounts", methods=["GET"])
 def all_accounts():
@@ -120,7 +128,6 @@ def all_accounts():
     cols = ["CONS_NO", "FLAG", "total_consumption",
             "avg_daily", "max_daily", "zero_days", "risk_level"]
     return jsonify({"accounts": sample[cols].round(2).to_dict(orient="records")})
-
 
 @app.route("/api/admin/chat", methods=["POST"])
 def admin_chat():
@@ -141,12 +148,9 @@ Admin question: {question}
 
 Answer professionally, give actionable recommendations.
 """
-    return jsonify({"response": ask_gemini(prompt)})
+    return jsonify({"response": ask_ai(prompt)})
 
-
-# ─────────────────────────────────────────────
-# CLIENT ROUTES
-# ─────────────────────────────────────────────
+# ===================== CLIENT ROUTES =====================
 
 @app.route("/api/client/overview", methods=["GET"])
 def client_overview():
@@ -160,7 +164,6 @@ def client_overview():
         "estimated_loss_pkr": estimated_loss,
         "estimated_loss_million": round(estimated_loss / 1_000_000, 2)
     })
-
 
 @app.route("/api/client/theft-breakdown", methods=["GET"])
 def theft_breakdown():
@@ -179,7 +182,6 @@ def theft_breakdown():
             {"label": "Clean Accounts", "value": clean, "color": "#22c55e"},
         ]
     })
-
 
 @app.route("/api/client/chat", methods=["POST"])
 def client_chat():
@@ -202,21 +204,7 @@ Executive question: {question}
 
 Respond with executive-level insights, use data points, be concise and professional.
 """
-    return jsonify({"response": ask_gemini(prompt)})
-
-
-if __name__ == "__main__":
-    print("\n" + "=" * 50)
-    print("⚡ Watt_Guard Backend")
-    print("=" * 50)
-    print(f"🌐 Running at: http://127.0.0.1:5000")
-    print(f"🤖 AI: {'ENABLED' if AI_AVAILABLE else 'DISABLED'}")
-    print("=" * 50 + "\n")
-    app.run(debug=True, port=5000)
-if __name__ == '__main__':
-    import os
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    return jsonify({"response": ask_ai(prompt)})
 
 if __name__ == '__main__':
     import os
