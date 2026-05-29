@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { ShieldAlert, Users, AlertTriangle, CheckCircle, Loader, Send, MessageSquare } from "lucide-react";
 
-const API = "http://127.0.0.1:5000";
+const API = process.env.REACT_APP_API_URL || "http://127.0.0.1:5000";
 
 export default function AdminDashboard() {
   const [summary, setSummary] = useState(null);

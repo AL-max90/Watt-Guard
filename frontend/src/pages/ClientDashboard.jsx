@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, Tooltip, ResponsiveContainer, Legend
+  XAxis, YAxis, Tooltip, ResponsiveContainer
 } from "recharts";
 import { TrendingUp, DollarSign, Loader, Send, MessageSquare, Zap } from "lucide-react";
 
-const API = "http://127.0.0.1:5000";
+const API = process.env.REACT_APP_API_URL || "http://127.0.0.1:5000";
 
 export default function ClientDashboard() {
   const [overview, setOverview] = useState(null);
