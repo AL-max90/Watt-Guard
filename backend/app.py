@@ -24,7 +24,7 @@ def ask_ai(prompt):
     }
     
     data = {
-        "model": "mixtral-8x7b-32768",
+        "model": "llama-3.3-70b-versatile",
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.7,
         "max_tokens": 500
