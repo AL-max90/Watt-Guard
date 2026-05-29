@@ -1,21 +1,21 @@
 import pandas as pd
 import numpy as np
+import gzip
 from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
+import os
+
+# Path to compressed CSV
+DATA_PATH = os.path.join(os.path.dirname(__file__), "data", "consumption.csv.gz")
 
 def load_data():
-    data = {
-        'CONS_NO': ['ACC001', 'ACC002', 'ACC003', 'ACC004', 'ACC005'],
-        'FLAG': [0, 1, 0, 0, 1],
-        '1/1/2024': [100, 500, 250, 75, 800],
-        '2/1/2024': [105, 520, 255, 78, 820],
-        '3/1/2024': [110, 510, 260, 80, 810],
-        '4/1/2024': [108, 505, 258, 82, 805],
-        '5/1/2024': [115, 495, 265, 85, 795],
-        '6/1/2024': [120, 490, 270, 88, 790],
-    }
-    df = pd.DataFrame(data)
-    print(f"Loaded {len(df)} accounts")
+    """Load data from compressed CSV file"""
+    if not os.path.exists(DATA_PATH):
+        raise FileNotFoundError(f"CSV file not found at {DATA_PATH}")
+    
+    # Read gzipped CSV directly
+    df = pd.read_csv(DATA_PATH, compression='gzip')
+    print(f"✅ Loaded {len(df)} accounts from compressed CSV")
     return df
 
 def get_date_columns(df):
@@ -44,7 +44,7 @@ def detect_anomalies(features):
     preds = model.fit_predict(scaled)
     features = features.copy()
     features["anomaly"] = preds
-    features["is_suspicious"] = features["anomaly"] == -1
+    features["is_suspicious"] = features["anomaly"].apply(lambda x: True if x == -1 else False)
     features["risk_level"] = features["anomaly"].apply(lambda x: "High" if x == -1 else "Normal")
     return features
 
