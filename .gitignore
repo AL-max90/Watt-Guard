@@ -23,5 +23,3 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
-backend/data/consumption.csv
-backend/data/*.csv
