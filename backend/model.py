@@ -4,14 +4,16 @@ from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
 import os
 
-# Get the absolute path to the data file
+# Get the directory where this file is located
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(BASE_DIR, "data", "consumption.csv")
 
 def load_data():
+    print(f"Looking for data at: {DATA_PATH}")
     if not os.path.exists(DATA_PATH):
         raise FileNotFoundError(f"Dataset not found at {DATA_PATH}")
     df = pd.read_csv(DATA_PATH)
+    print(f"Loaded {len(df)} accounts")
     return df
 
 def get_date_columns(df):
