@@ -28,13 +28,7 @@ print(f"✅ Loaded {len(df_raw)} accounts")
 
 
 def ask_gemini(prompt):
-    if not AI_AVAILABLE:
-        return "AI not available. Check your Gemini API key in .env"
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=prompt
-    )
-    return response.text
+    return ask_groq(prompt)
 
 
 # ─────────────────────────────────────────────
