@@ -1,21 +1,28 @@
 import pandas as pd
 import numpy as np
-import gzip
 from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
+import gzip
 import os
+import gc
 
-# Path to compressed CSV
 DATA_PATH = os.path.join(os.path.dirname(__file__), "data", "consumption.csv.gz")
 
 def load_data():
-    """Load data from compressed CSV file"""
+    """Load and optimize data to reduce memory usage"""
     if not os.path.exists(DATA_PATH):
         raise FileNotFoundError(f"CSV file not found at {DATA_PATH}")
     
-    # Read gzipped CSV directly
-    df = pd.read_csv(DATA_PATH, compression='gzip')
-    print(f"✅ Loaded {len(df)} accounts from compressed CSV")
+    # Read only necessary columns
+    df = pd.read_csv(DATA_PATH, compression='gzip', low_memory=False)
+    
+    # Convert to smaller data types
+    for col in df.select_dtypes(include=['float64']).columns:
+        df[col] = df[col].astype('float32')
+    for col in df.select_dtypes(include=['int64']).columns:
+        df[col] = df[col].astype('int32')
+    
+    print(f"✅ Loaded {len(df)} accounts (optimized memory)")
     return df
 
 def get_date_columns(df):
@@ -26,13 +33,18 @@ def compute_features(df):
     features = pd.DataFrame()
     features["CONS_NO"] = df["CONS_NO"]
     features["FLAG"] = df["FLAG"]
-    features["total_consumption"] = df[date_cols].sum(axis=1)
-    features["avg_daily"] = df[date_cols].mean(axis=1)
-    features["max_daily"] = df[date_cols].max(axis=1)
-    features["min_daily"] = df[date_cols].min(axis=1)
-    features["std_consumption"] = df[date_cols].std(axis=1)
-    features["zero_days"] = (df[date_cols] == 0).sum(axis=1)
-    features["null_days"] = df[date_cols].isnull().sum(axis=1)
+    features["total_consumption"] = df[date_cols].sum(axis=1).astype('float32')
+    features["avg_daily"] = df[date_cols].mean(axis=1).astype('float32')
+    features["max_daily"] = df[date_cols].max(axis=1).astype('float32')
+    features["min_daily"] = df[date_cols].min(axis=1).astype('float32')
+    features["std_consumption"] = df[date_cols].std(axis=1).astype('float32')
+    features["zero_days"] = (df[date_cols] == 0).sum(axis=1).astype('int16')
+    features["null_days"] = df[date_cols].isnull().sum(axis=1).astype('int16')
+    
+    # Free up memory
+    del df
+    gc.collect()
+    
     return features.fillna(0)
 
 def detect_anomalies(features):
