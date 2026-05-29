@@ -4,25 +4,20 @@ from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
 import os
 
-# Try multiple possible paths
-possible_paths = [
-    "backend/data/consumption.csv",  # Local development path
-    "data/consumption.csv",           # Railway path
-    "/app/data/consumption.csv",      # Absolute Railway path
-    "consumption.csv"                 # Root path
-]
-
-DATA_PATH = None
-for path in possible_paths:
-    if os.path.exists(path):
-        DATA_PATH = path
-        print(f"Found dataset at: {DATA_PATH}")
-        break
-
-if DATA_PATH is None:
-    raise FileNotFoundError(f"Could not find consumption.csv in any of: {possible_paths}")
+# Look for CSV in the current directory (where Railway runs)
+DATA_PATH = "consumption.csv"
 
 def load_data():
+    print(f"Looking for data at: {DATA_PATH}")
+    print(f"Current directory contents: {os.listdir('.')}")
+    if not os.path.exists(DATA_PATH):
+        # Try alternative path
+        DATA_PATH = "backend/data/consumption.csv"
+        print(f"Trying alternative: {DATA_PATH}")
+    
+    if not os.path.exists(DATA_PATH):
+        raise FileNotFoundError(f"Dataset not found at {DATA_PATH}")
+    
     df = pd.read_csv(DATA_PATH)
     print(f"Loaded {len(df)} accounts")
     return df
