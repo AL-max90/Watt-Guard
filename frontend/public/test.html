@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Watt_Guard API Test</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        pre { background: #f0f0f0; padding: 10px; border-radius: 5px; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Watt_Guard API Test</h1>
+    <div id="status">Testing API connection...</div>
+    <pre id="result"></pre>
+
+    <script>
+        const API_URL = 'https://watt-guard.up.railway.app/api/admin/summary';
+        
+        fetch(API_URL)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('status').innerHTML = '<span class="success">✅ API is working!</span>';
+                document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+            })
+            .catch(err => {
+                document.getElementById('status').innerHTML = '<span class="error">❌ Error: ' + err.message + '</span>';
+                document.getElementById('result').textContent = 'Failed to connect to backend';
+            });
+    </script>
+</body>
+</html>
