@@ -4,22 +4,20 @@ from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
 import os
 
-# Look for CSV in the current directory (where Railway runs)
-DATA_PATH = "consumption.csv"
-
 def load_data():
-    print(f"Looking for data at: {DATA_PATH}")
-    print(f"Current directory contents: {os.listdir('.')}")
-    if not os.path.exists(DATA_PATH):
-        # Try alternative path
-        DATA_PATH = "backend/data/consumption.csv"
-        print(f"Trying alternative: {DATA_PATH}")
-    
-    if not os.path.exists(DATA_PATH):
-        raise FileNotFoundError(f"Dataset not found at {DATA_PATH}")
-    
-    df = pd.read_csv(DATA_PATH)
-    print(f"Loaded {len(df)} accounts")
+    # Create hardcoded dataset directly in code
+    data = {
+        'CONS_NO': ['ACC001', 'ACC002', 'ACC003', 'ACC004', 'ACC005', 'ACC006', 'ACC007', 'ACC008', 'ACC009', 'ACC010'],
+        'FLAG': [0, 1, 0, 0, 1, 0, 0, 1, 0, 0],
+        '1/1/2024': [100, 500, 250, 75, 800, 150, 300, 1200, 45, 600],
+        '2/1/2024': [105, 520, 255, 78, 820, 155, 305, 1220, 48, 610],
+        '3/1/2024': [110, 510, 260, 80, 810, 160, 310, 1210, 50, 620],
+        '4/1/2024': [108, 505, 258, 82, 805, 158, 308, 1205, 52, 615],
+        '5/1/2024': [115, 495, 265, 85, 795, 165, 315, 1195, 55, 625],
+        '6/1/2024': [120, 490, 270, 88, 790, 170, 320, 1190, 58, 630],
+    }
+    df = pd.DataFrame(data)
+    print(f"✅ Loaded {len(df)} accounts from hardcoded data")
     return df
 
 def get_date_columns(df):
