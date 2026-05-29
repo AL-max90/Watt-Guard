@@ -2,19 +2,18 @@ import pandas as pd
 import numpy as np
 from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
-import os
 
 def load_data():
-    # Create hardcoded dataset directly in code
+    # Create hardcoded dataset directly in code - no file needed!
     data = {
-        'CONS_NO': ['ACC001', 'ACC002', 'ACC003', 'ACC004', 'ACC005', 'ACC006', 'ACC007', 'ACC008', 'ACC009', 'ACC010'],
-        'FLAG': [0, 1, 0, 0, 1, 0, 0, 1, 0, 0],
-        '1/1/2024': [100, 500, 250, 75, 800, 150, 300, 1200, 45, 600],
-        '2/1/2024': [105, 520, 255, 78, 820, 155, 305, 1220, 48, 610],
-        '3/1/2024': [110, 510, 260, 80, 810, 160, 310, 1210, 50, 620],
-        '4/1/2024': [108, 505, 258, 82, 805, 158, 308, 1205, 52, 615],
-        '5/1/2024': [115, 495, 265, 85, 795, 165, 315, 1195, 55, 625],
-        '6/1/2024': [120, 490, 270, 88, 790, 170, 320, 1190, 58, 630],
+        'CONS_NO': ['ACC001', 'ACC002', 'ACC003', 'ACC004', 'ACC005'],
+        'FLAG': [0, 1, 0, 0, 1],
+        '1/1/2024': [100, 500, 250, 75, 800],
+        '2/1/2024': [105, 520, 255, 78, 820],
+        '3/1/2024': [110, 510, 260, 80, 810],
+        '4/1/2024': [108, 505, 258, 82, 805],
+        '5/1/2024': [115, 495, 265, 85, 795],
+        '6/1/2024': [120, 490, 270, 88, 790],
     }
     df = pd.DataFrame(data)
     print(f"✅ Loaded {len(df)} accounts from hardcoded data")
