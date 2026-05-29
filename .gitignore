@@ -1,0 +1,27 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+.env
+*.pyo
+*.pyd
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# React build
+build/
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+backend/data/consumption.csv
+backend/data/*.csv
