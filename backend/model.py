@@ -4,7 +4,9 @@ from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
 import os
 
-DATA_PATH = os.path.join(os.path.dirname(__file__), "data", "consumption.csv")
+# Get the directory where this file is located
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = os.path.join(BASE_DIR, "data", "consumption.csv")
 
 def load_data():
     df = pd.read_csv(DATA_PATH)
@@ -32,7 +34,7 @@ def detect_anomalies(features):
                     "std_consumption", "zero_days"]
     scaler = StandardScaler()
     scaled = scaler.fit_transform(features[feature_cols])
-    model = IsolationForest(contamination=0.15, random_state=42)
+    model = IsolationForest(contamination=0.1, random_state=42)
     preds = model.fit_predict(scaled)
     features = features.copy()
     features["anomaly"] = preds
