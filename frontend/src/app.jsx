@@ -1,5 +1,7 @@
-import TestApi from './TestApi';
+import TestApi from './components/TestApi';
 
-export default function App() {
+function App() {
   return <TestApi />;
 }
+
+export default App;
