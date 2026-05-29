@@ -4,6 +4,7 @@ from model import (load_data, compute_features, detect_anomalies,
                    get_summary, get_flagged, get_monthly_trend)
 from google import genai
 from dotenv import load_dotenv
+from groq_helper import ask_groq
 import os
 
 load_dotenv()
